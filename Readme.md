@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг»
 
 * Студент: [Anton Bazhko](https://up.htmlacademy.ru/javascript/25/user/1467059).
-* Наставник: `Неизвестно`.
+* Наставник: [Иван Кривонос](https://htmlacademy.ru/profile/id1311037).
 
 ---
 
