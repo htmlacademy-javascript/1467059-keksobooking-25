@@ -108,5 +108,3 @@ const newObject = () => {
 };
 
 const randomObjects = Array.from({length: 10}, newObject);
-
-console.log(randomObjects);
