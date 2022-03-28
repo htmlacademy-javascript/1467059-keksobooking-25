@@ -16,6 +16,7 @@ const typesDictionary = {
 
 similarNotices.forEach(({author, offer}) => {
   const noticeCardEl = noticeCardTemplate.cloneNode(true);
+  const features = noticeCardEl.querySelectorAll('.popup__feature');
   const title = noticeCardEl.querySelector('.popup__title');
   const address = noticeCardEl.querySelector('.popup__text--address');
   const apartmentType = noticeCardEl.querySelector('.popup__type');
@@ -23,52 +24,102 @@ similarNotices.forEach(({author, offer}) => {
   const capacity = noticeCardEl.querySelector('.popup__text--capacity');
   const checkTime = noticeCardEl.querySelector('.popup__text--time');
   const description = noticeCardEl.querySelector('.popup__description');
+  const photos = noticeCardEl.querySelector('.popup__photos');
   const avatar = noticeCardEl.querySelector('.popup__avatar');
 
-  title.textContent = offer.title;
-  address.textContent = offer.address;
-  apartmentType.textContent = typesDictionary[offer.type];
-  price.textContent = `${offer.price} ₽/ночь`;
-  capacity.textContent = `${offer.rooms} комнаты для ${offer.guests} гостей`;
-  checkTime.textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
-  description.textContent = offer.description;
-  avatar.src = author.avatar;
+  if (title) {
+    title.textContent = offer.title;
+  } else {
+    title.classList.add('hidden');
+  }
 
-  const getPhotos = () => {
-    const photosContainer = noticeCardEl.querySelector('.popup__photos');
-    const photosFragment = document.createDocumentFragment();
+  if (address) {
+    address.textContent = offer.address;
+  } else {
+    address.classList.add('hidden');
+  }
 
-    for (let i = 0; i < offer.photos.length - 1; i++) {
-      const newElement = noticeCardEl.querySelector('.popup__photo').cloneNode(false);
-      newElement.src = offer.photos[i];
-      photosFragment.appendChild(newElement);
-    }
+  if (apartmentType) {
+    apartmentType.textContent = typesDictionary[offer.type];
+  } else {
+    apartmentType.classList.add('hidden');
+  }
 
-    photosContainer.textContent = '';
-    photosContainer.appendChild(photosFragment);
-  };
+  if (price) {
+    price.textContent = `${offer.price} ₽/ночь`;
+  } else {
+    price.classList.add('hidden');
+  }
 
-  getPhotos();
+  if (capacity) {
+    capacity.textContent = `${offer.rooms} комнаты для ${offer.guests} гостей`;
+  } else {
+    capacity.classList.add('hidden');
+  }
 
-  noticeWindow.appendChild(noticeCardEl);
+  if (checkTime) {
+    checkTime.textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
+  } else {
+    checkTime.classList.add('hidden');
+  }
 
-  const getApartmentFeatures = () => {
-    const apartmentFeatures = offer.features;
-    const featuresContainer = document.querySelector('.popup__features');
-    const featuresList = featuresContainer.querySelectorAll('.popup__feature');
+  if (description) {
+    description.textContent = offer.description;
+  } else {
+    description.classList.add('hidden');
+  }
 
-    featuresList.forEach((featuresListItem) => {
-      const isInclude = apartmentFeatures.some(
-        (apartmentFeature) => featuresListItem.classList.contains(`popup__feature--${apartmentFeature}`),
-      );
+  if (avatar) {
+    avatar.src = author.avatar;
+  } else {
+    avatar.classList.add('hidden');
+  }
 
-      if(!isInclude) {
-        featuresListItem.remove();
+  if (photos) {
+    const getPhotos = () => {
+      const photosFragment = document.createDocumentFragment();
+      const photosContainer = photos.cloneNode(false);
+
+      for (let i = 0; i < offer.photos.length - 1; i++) {
+        const newElement = noticeCardEl.querySelector('.popup__photo').cloneNode(false);
+        newElement.src = offer.photos[i];
+        photosFragment.appendChild(newElement);
       }
-    });
-  };
 
-  getApartmentFeatures ();
+      photosContainer.append(photosFragment);
+      return photosContainer;
+    };
 
+    noticeCardEl.replaceChild(getPhotos(), photos);
+  } else {
+    photos.classList.add('hidden');
+  }
+
+  if (features) {
+    const getApartmentFeatures = () => {
+      const apartmentFeatures = offer.features;
+      const featuresContainer = document.querySelector('.popup__features');
+      const featuresList = featuresContainer.querySelectorAll('.popup__feature');
+
+      featuresList.forEach((featuresListItem) => {
+        const isInclude = apartmentFeatures.some(
+          (apartmentFeature) => featuresListItem.classList.contains(`popup__feature--${apartmentFeature}`),
+        );
+
+        if(!isInclude) {
+          featuresListItem.remove();
+        }
+      });
+      return featuresContainer;
+    };
+
+    noticeWindow.appendChild(noticeCardEl);
+
+    noticeCardEl.replaceChild(getApartmentFeatures(), noticeCardEl.querySelector('.popup__features'));
+  } else {
+    noticeCardEl.querySelector('.popup__features').remove();
+  }
+
+  return noticeCardEl;
 });
 
