@@ -14,9 +14,9 @@ const typesDictionary = {
   hotel: 'Отель'
 };
 
-similarNotices.forEach(({author, offer}) => {
-  const noticeCardEl = noticeCardTemplate.cloneNode(true);
-  const features = noticeCardEl.querySelectorAll('.popup__feature');
+const generateNoticeTemplate = ({author, offer}, template) => {
+  const noticeCardEl = template.cloneNode(true);
+  const features = noticeCardEl.querySelector('.popup__features');
   const title = noticeCardEl.querySelector('.popup__title');
   const address = noticeCardEl.querySelector('.popup__text--address');
   const apartmentType = noticeCardEl.querySelector('.popup__type');
@@ -27,99 +27,103 @@ similarNotices.forEach(({author, offer}) => {
   const photos = noticeCardEl.querySelector('.popup__photos');
   const avatar = noticeCardEl.querySelector('.popup__avatar');
 
-  if (title) {
-    title.textContent = offer.title;
-  } else {
-    title.classList.add('hidden');
-  }
+  const getPhotos = () => {
+    const photosFragment = document.createDocumentFragment();
+    const photosContainer = photos.cloneNode(false);
 
-  if (address) {
-    address.textContent = offer.address;
-  } else {
-    address.classList.add('hidden');
-  }
+    for (let i = 0; i < offer.photos.length - 1; i++) {
+      const newElement = noticeCardEl.querySelector('.popup__photo').cloneNode(false);
+      newElement.src = offer.photos[i];
+      photosFragment.appendChild(newElement);
+    }
 
-  if (apartmentType) {
-    apartmentType.textContent = typesDictionary[offer.type];
-  } else {
-    apartmentType.classList.add('hidden');
-  }
+    photosContainer.append(photosFragment);
 
-  if (price) {
-    price.textContent = `${offer.price} ₽/ночь`;
-  } else {
-    price.classList.add('hidden');
-  }
+    return photosContainer;
+  };
 
-  if (capacity) {
-    capacity.textContent = `${offer.rooms} комнаты для ${offer.guests} гостей`;
-  } else {
-    capacity.classList.add('hidden');
-  }
+  const getApartmentFeatures = () => {
+    const apartmentFeatures = offer.features;
+    const featuresContainer = noticeCardEl.querySelector('.popup__features');
+    const featuresList = featuresContainer.querySelectorAll('.popup__feature');
 
-  if (checkTime) {
-    checkTime.textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
-  } else {
-    checkTime.classList.add('hidden');
-  }
+    featuresList.forEach((featuresListItem) => {
+      const isInclude = apartmentFeatures.some(
+        (apartmentFeature) => featuresListItem.classList.contains(`popup__feature--${apartmentFeature}`),
+      );
 
-  if (description) {
-    description.textContent = offer.description;
-  } else {
-    description.classList.add('hidden');
-  }
-
-  if (avatar) {
-    avatar.src = author.avatar;
-  } else {
-    avatar.classList.add('hidden');
-  }
-
-  if (photos) {
-    const getPhotos = () => {
-      const photosFragment = document.createDocumentFragment();
-      const photosContainer = photos.cloneNode(false);
-
-      for (let i = 0; i < offer.photos.length - 1; i++) {
-        const newElement = noticeCardEl.querySelector('.popup__photo').cloneNode(false);
-        newElement.src = offer.photos[i];
-        photosFragment.appendChild(newElement);
+      if(!isInclude) {
+        featuresListItem.remove();
       }
+    });
 
-      photosContainer.append(photosFragment);
-      return photosContainer;
-    };
+    return featuresContainer;
+  };
 
-    noticeCardEl.replaceChild(getPhotos(), photos);
+  if (!offer.title) {
+    title.classList.add('hidden');
   } else {
-    photos.classList.add('hidden');
+    title.textContent = offer.title;
   }
 
-  if (features) {
-    const getApartmentFeatures = () => {
-      const apartmentFeatures = offer.features;
-      const featuresContainer = document.querySelector('.popup__features');
-      const featuresList = featuresContainer.querySelectorAll('.popup__feature');
-
-      featuresList.forEach((featuresListItem) => {
-        const isInclude = apartmentFeatures.some(
-          (apartmentFeature) => featuresListItem.classList.contains(`popup__feature--${apartmentFeature}`),
-        );
-
-        if(!isInclude) {
-          featuresListItem.remove();
-        }
-      });
-      return featuresContainer;
-    };
-
-    noticeWindow.appendChild(noticeCardEl);
-
-    noticeCardEl.replaceChild(getApartmentFeatures(), noticeCardEl.querySelector('.popup__features'));
+  if (!offer.address) {
+    address.classList.add('hidden');
   } else {
-    noticeCardEl.querySelector('.popup__features').remove();
+    address.textContent = offer.address;
+  }
+
+  if (!offer.apartmentType) {
+    apartmentType.classList.add('hidden');
+  } else {
+    apartmentType.textContent = typesDictionary[offer.type];
+  }
+
+  if (!offer.price) {
+    price.classList.add('hidden');
+  } else {
+    price.textContent = `${offer.price} ₽/ночь`;
+  }
+
+  if (!offer.capacity) {
+    capacity.classList.add('hidden');
+  } else {
+    capacity.textContent = `${offer.rooms} комнаты для ${offer.guests} гостей`;
+  }
+
+  if (!offer.checkTime) {
+    checkTime.classList.add('hidden');
+  } else {
+    checkTime.textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
+  }
+
+  if (!offer.description) {
+    description.classList.add('hidden');
+  } else {
+    description.textContent = offer.description;
+  }
+
+  if (!author.avatar) {
+    avatar.classList.add('hidden');
+  } else {
+    avatar.src = author.avatar;
+  }
+
+  if (!offer.photos) {
+    photos.classList.add('hidden');
+  } else {
+    noticeCardEl.replaceChild(getPhotos(), photos);
+  }
+
+  if (!offer.features) {
+    features.classList.add('hidden');
+  } else {
+    noticeCardEl.replaceChild(getApartmentFeatures(), features);
   }
 
   return noticeCardEl;
-});
+};
 
+similarNotices.forEach((notice) => {
+  const template = generateNoticeTemplate(notice, noticeCardTemplate);
+  noticeWindow.append(template);
+});
