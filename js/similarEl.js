@@ -60,17 +60,18 @@ const generateNoticeTemplate = ({author, offer}, template) => {
     return featuresContainer;
   };
 
-  if (!offer.title) {
-    title.classList.add('hidden');
-  } else {
-    title.textContent = offer.title;
-  }
+  const setDataToNode = (data, node) => {
+    if(!data) {
+      node.classList.add('hidden');
+    } else {
+      node.textContent = data;
+    }
+  };
 
-  if (!offer.address) {
-    address.classList.add('hidden');
-  } else {
-    address.textContent = offer.address;
-  }
+  setDataToNode(offer.title, title);
+  setDataToNode(offer.address, address);
+  setDataToNode(offer.description, description);
+
 
   if (!offer.apartmentType) {
     apartmentType.classList.add('hidden');
@@ -94,12 +95,6 @@ const generateNoticeTemplate = ({author, offer}, template) => {
     checkTime.classList.add('hidden');
   } else {
     checkTime.textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
-  }
-
-  if (!offer.description) {
-    description.classList.add('hidden');
-  } else {
-    description.textContent = offer.description;
   }
 
   if (!author.avatar) {
