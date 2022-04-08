@@ -4,7 +4,18 @@ const adTitle = adForm.querySelector('#title');
 const adPrice = adForm.querySelector('#price');
 const adRoomQty = adForm.querySelector('#room_number');
 const adCapacity = adForm.querySelector('#capacity');
+const adTypeOfHouse = adForm.querySelector('#type');
+const adTimeData = adForm.querySelector('.ad-form__element--time');
+const adTime = adTimeData.querySelectorAll('select');
 const adSubmitButton = adForm.querySelector('.ad-form__submit');
+
+const houseMinPrice = {
+  bungalow : 0,
+  flat : 1000,
+  hotel: 3000,
+  house : 5000,
+  palace : 10000,
+};
 
 const pristine = new Pristine(adForm, {
   classTo: 'ad-form__element',
@@ -46,6 +57,40 @@ const getSettleErrorMessage = () => 'Выбранная опция заселе�
 pristine.addValidator(adRoomQty, validateSettle, getSettleErrorMessage);
 pristine.addValidator(adCapacity, validateSettle, getSettleErrorMessage);
 
+//Type Of house
+
+const validateTypeOfHouse = (value) => {
+  const appartment = adTypeOfHouse.value;
+  return parseInt(value, 10) >= houseMinPrice[appartment];
+};
+
+const onChangePrice  = (value) => {
+  adPrice.placeholder = houseMinPrice[value];
+  pristine.validate(adPrice);
+};
+
+adTypeOfHouse.addEventListener('change', () => onChangePrice(adTypeOfHouse.value));
+
+pristine.addValidator(adTypeOfHouse, validateTypeOfHouse, 'Введите стоимость из разрешенного диапазона');
+pristine.addValidator(adPrice, validateTypeOfHouse, 'Введите стоимость из разрешенного диапазона');
+
+//Check in
+
+const setWindowTime = (select, index) => {
+  const timeIndex = select === 'timein' ? select = '#timeout' : select = '#timein';
+  adTimeData.querySelector(timeIndex).selectedIndex = index;
+};
+
+adTime.forEach((select) => {
+  select.addEventListener('change', (evt) => {
+    const selectTimeId = evt.target.id;
+    const selectTimeOption = evt.target.selectedIndex;
+
+    setWindowTime(selectTimeId, selectTimeOption);
+  });
+});
+
+//Submit deactivation
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
@@ -54,5 +99,3 @@ adForm.addEventListener('submit', (evt) => {
     adForm.submit();
   }
 });
-
-// export {setUserFormSubmit};
